@@ -50,12 +50,12 @@ public class UserController {
     // 유저 정보 수정 페이지(동적) - 로그인 O 인증 필요
     @GetMapping("/user/{id}/updateForm")
     public String updateForm(@PathVariable Integer id) {
-        return "user/detail";
+        return "user/updateForm";
 
     }
 
     // 유저 수정 - 로그인 O 인증 필요
-    @PutMapping("/user/{id}")
+    @PutMapping("/user/{id}/")
     public String update(@PathVariable Integer id) {
         return "redirect:/user/" + id;
 
