@@ -37,12 +37,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id; // primary key
 
-    @Column(length = 20, unique = true)
+    @Column(length = 20, unique = true, nullable = false)
     private String username; // ssar 아이디
     @Column(length = 12, nullable = false)
     private String password;
 
-    @Column(length = 16000000)
+    @Column(length = 16000000, nullable = false)
     private String email;
 
     @CreatedDate // insert

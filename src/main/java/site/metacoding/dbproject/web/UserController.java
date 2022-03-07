@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import ch.qos.logback.core.joran.conditional.ElseAction;
 import site.metacoding.dbproject.domain.user.User;
@@ -40,10 +41,32 @@ public class UserController {
     // 회원가입 - 로그인X
     @PostMapping("/join")
     public String join(User user) {
+
+        // 1. null 값 먼저 확인
+        // 2, 공백 넣는거 방지
         System.out.println("User : " + user);
-        User userEntity = userRepository.save(user);
-        System.out.println("userEntity : " + userEntity);
-        return "redirect:/loginForm";// 로그인페이지 이동해주는 컨트롤러 메서드를 재활용
+
+        // 밑에 꺼는 들어오기 전에 차단하는 방법 근데 이건 사실상 힘들다. 이유: 마트에 강도가 들어올 때 소지품 검사도 다 했지만 강도가 주먹으로
+        // 강도짓을 할 수 있음.
+        // try catch 를 통해 터진 후에 잡는 것이 훨씬 좋다.
+        if (user.getPassword() == null || user.getEmail() == null || user.getUsername() == null) {
+            System.out.println("제대로 입력되지 않았습니다.");
+
+            return "redirect:/joinForm";
+        }
+        if (user.getPassword().length() > 12) {
+            System.out.println("비밀번호가 12자리가 초과되었습니다.");
+
+            return "redirect:/joinForm";
+        }
+        if (user.getPassword().equals(" ") || user.getEmail().equals(" ") || user.getUsername().equals(" ")) {
+            return "redirect:/joinForm";
+        } else {
+            User userEntity = userRepository.save(user);
+            System.out.println("userEntity : " + userEntity);
+            return "redirect:/loginForm";// 로그인페이지 이동해주는 컨트롤러 메서드를 재활용
+
+        }
     }
 
     // 로그인 페이지 (정적) - 로그인X
@@ -93,6 +116,7 @@ public class UserController {
         if (principal.getId() != id) {
             return "error/page1";
         }
+
         // 3. 핵심로직
         Optional<User> userOp = userRepository.findById(id);
         // 경고창 같은게 있으면 좋다!!
@@ -104,7 +128,7 @@ public class UserController {
 
         } else {
 
-            return "error/page1";
+            return "error   /page1";
         }
     }
 
