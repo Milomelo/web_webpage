@@ -1,18 +1,35 @@
 package site.metacoding.dbproject.web;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import site.metacoding.dbproject.domain.user.User;
+import lombok.RequiredArgsConstructor;
+import site.metacoding.dbproject.domain.post.Post;
+import site.metacoding.dbproject.domain.post.PostRepository;
+
+@RequiredArgsConstructor // final이 붙은 애들에 대한 생성자를 만들어준다.
 @Controller
 public class PostController {
+
+    private final HttpSession session;
+    private final PostRepository postRepository;
 
     // GET 글쓰기 페이지 /post/writeForm - 인증 필요
     @GetMapping("/s/post/writeForm")
     public String writeForm() {
+
+        if (session.getAttribute("principal") == null) {
+            return "redirect:/loginForm";
+        }
+
         return "post/writeForm";
     }
 
@@ -20,7 +37,13 @@ public class PostController {
     // GET 글목록 페이지 /post/list, / - 인증 필요x
     // @GetMapping({"/", "/post/list"})
     @GetMapping({ "/", "/post/list" })
-    public String list() {
+    public String list(Model model) {
+
+        // 1. POSTREPOSITORY의 FINDALL() 호출
+
+        // 2. 모델에 담기
+        model.addAttribute("posts", postRepository.findAll());
+
         return "post/list";
     }
 
@@ -50,7 +73,15 @@ public class PostController {
 
     // POST 글쓰기 /post - 글목록으로 가기 - 인증 필요
     @PostMapping("/s/post")
-    public String write() {
+    public String write(Post post) {
+
+        if (session.getAttribute("principal") == null) {
+            return "redirect:/loginForm";
+        }
+        User principal = (User) session.getAttribute("principal");
+        post.setUser(principal);
+        // insert into post(title, content, userid) values(사용자, 사용자,세션오브젝트의 pk)
+        postRepository.save(post);
         return "redirect:/";
     }
 }
