@@ -1,21 +1,27 @@
 {{>/layout/header}}
-<!-- 컨테이너 시작 -->
-<div class="container mt-3">
-    <!-- 게시글 아이템 시작 -->
-    {{#posts}}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h4 class="card-title">{{title}}</h4>
-            <a href="/post/{{id}}" class="btn btn-dark">상세보기</a>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+
+<div class="w3-container">
+    <h2>Dropdown Button</h2>
+    <p>Move the mouse over the button to open the dropdown content.</p>
+    <div class="w3-dropdown-hover">
+        <button class="w3-button w3-black">Hover Over Me!</button>
+        <div class="w3-dropdown-content w3-bar-block w3-border">
+            {{#posts}}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h4 class="card-title">{{title}}</h4>
+                    <a href="/post/{{id}}" class="btn btn-dark">상세보기</a>
+                </div>
+            </div>
+            <!-- 게시글 아이템 끝 -->
+            {{/posts}}
         </div>
     </div>
-    <!-- 게시글 아이템 끝 -->
-    {{/posts}}
-    <ul class="pagination justify-content-center">
-        <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-        <li class="page-item"><a class="page-link" href="#">다음</a></li>
-    </ul>
 </div>
+
 <!-- 컨테이너 끝 -->
 
 {{>/layout/footer}}
