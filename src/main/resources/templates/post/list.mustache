@@ -4,22 +4,36 @@
 
 
 <div class="w3-container">
-    <h2>Dropdown Button</h2>
-    <p>Move the mouse over the button to open the dropdown content.</p>
-    <div class="w3-dropdown-hover">
-        <button class="w3-button w3-black">Hover Over Me!</button>
-        <div class="w3-dropdown-content w3-bar-block w3-border">
-            {{#posts}}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h4 class="card-title">{{title}}</h4>
-                    <a href="/post/{{id}}" class="btn btn-dark">상세보기</a>
-                </div>
-            </div>
-            <!-- 게시글 아이템 끝 -->
-            {{/posts}}
+    현재페이지 번호:{{posts.number}}<br />
+    첫 페이지: {{posts.first}}<br />
+    마지막 페이지:{{posts.last}}<br />
+    {{#posts}}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4 class="card-title">{{title}}</h4>
+            <a href="/post/{{id}}" class="btn btn-dark">상세보기</a>
         </div>
     </div>
+    {{/posts}}
+    <!-- 게시글 아이템 끝 -->
+
+    <ul class="pagination justify-content-center">
+        {{#posts.first}}
+        <li class="page-item disabled"><a class="page-link" href="?page={{prevPage}}">이전</a></li>
+        {{/posts.first}}
+        {{^posts.first}}
+        <li class="page-item"><a class="page-link" href="?page={{prevPage}}">이전</a></li>
+        {{/posts.first}}
+        {{#posts.last}}
+        <li class="page-item disabled"><a class="page-link" href="?page={{nextPage}}">다음</a></li>
+        {{/posts.last}}
+        {{^posts.last}}
+        <li class="page-item"><a class="page-link" href="?page={{nextPage}}">다음</a></li>
+        {{/posts.last}}
+    </ul>
+
+</div>
+</div>
 </div>
 
 <!-- 컨테이너 끝 -->

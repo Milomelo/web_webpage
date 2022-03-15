@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import site.metacoding.dbproject.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -40,15 +41,32 @@ public class PostController {
     // GET 글목록 페이지 /post/list, / - 인증 필요x
     // @GetMapping({"/", "/post/list"})
     @GetMapping({ "/", "/post/list" })
-    public String list(Model model) {
+    public String list(@RequestParam(defaultValue = "0") int page, Model model) {
 
         // 1. POSTREPOSITORY의 FINDALL() 호출
 
         // 2. 모델에 담기
-        model.addAttribute("posts", postRepository.findAll(Sort.by(Sort.Direction.DESC, "id")));
-
+        // model.addAttribute("posts",
+        // postRepository.findAll(Sort.by(Sort.Direction.DESC, "id")));
+        PageRequest pq = PageRequest.of(page, 3);
+        model.addAttribute("posts", postRepository.findAll(pq));
+        model.addAttribute("prevPage", page - 1);
+        model.addAttribute("nextPage", page + 1);
         return "post/list";
+
     }
+
+    // 테스트 용
+    // @GetMapping("/test/post/list")
+    // public @ResponseBody Page<Post> listTest(@RequestParam(defaultValue = "0")
+    // int page) {
+
+    // // if (page==null){
+    // // page=0; } 비추
+
+    // PageRequest pq = PageRequest.of(page, 3);
+    // return postRepository.findAll(pq);
+    // }
 
     // GET 글상세보기 페이지 /post/{id} (삭제버튼 만들어 두면됨, 수정버튼 만들어 두면됨) - 인증 필요 x
     @GetMapping("/post/{id}") // get 요청에 /post 제외 시키기
