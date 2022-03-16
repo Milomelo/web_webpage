@@ -13,23 +13,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import site.metacoding.dbproject.domain.user.User;
-import site.metacoding.dbproject.domain.user.UserRepository;
 import site.metacoding.dbproject.service.UserService;
 import site.metacoding.dbproject.web.dto.ResponseDto;
 
-@RequiredArgsConstructor
 @Controller
+@RequiredArgsConstructor
 public class UserController {
 
     // 컴포지션 (의존성 연결)
     private final UserService userService;
     private final HttpSession session;
-
-    private final UserRepository userRepository; // 좀있다 지워야함
 
     // DI 받는 코드
 
@@ -147,13 +145,32 @@ public class UserController {
         return "user/updateForm";
     }
 
+    // username(X), password(O), email(O)
+    // password=1234&email=ssar@nate.com (x-www-form-urlencoded)
+    // { "password" : "1234", "email" : "ssar@nate.com" } (application/json)
+    // json을 받을 것이기 때문에 Spring이 데이터 받을 때 파싱전략을 변경!!
+    // put 요청은 Http Body가 있다. Http Header의 content- Type에 MIME타입을 알려줘야한다.
     // 회원정보 수정완료 - 로그인O
+    // @RequestBody -> BufferReader +Json 파싱
+    // @ResponseBody -> Bufferwriter +Json 파싱
     @PutMapping("/s/user/{id}")
-    public String update(@PathVariable Integer id) {
-        // 더티채킹을 배웁시다
-        // 1분이면 끝납니다~잉
+    public @ResponseBody ResponseDto<String> update(@PathVariable Integer id, @RequestBody User user) {
 
-        return "redirect:/user/" + id;
+        User principal = (User) session.getAttribute("principal");
+
+        // 1. 인증 체크 -컨트롤러권한
+        if (principal == null) {
+            return new ResponseDto<String>(-1, "인증안됨", null);
+        }
+
+        // 2. 권한체크 -컨트롤러권한
+        if (principal.getId() != id) {
+            return new ResponseDto<String>(-1, "권한없어", null);
+        }
+        User userEntity = userService.유저수정(id, user);
+        session.setAttribute("principal", userEntity);
+
+        return new ResponseDto<String>(1, "성공", null);
     }
 
 }
