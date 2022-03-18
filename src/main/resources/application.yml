@@ -1,6 +1,6 @@
 # 서버의 포트, 컨텍스트 패스, 문자 인코딩 설정
 server:
-  port: 8080
+  port: 8888
   servlet:
     context-path: /
     encoding:
