@@ -10,7 +10,7 @@
         </div>
         <div class="mb-3">
             <textarea id="content" rows="10" class="form-control">
-                {{post.content}}
+{{post.content}}
             </textarea>
         </div>
         <button type="button" class="btn btn-secondary" id="btn-update">글쓰기 수정완료</button>
@@ -51,5 +51,10 @@
 
     });
 
+
+    $("#content").summernote({
+        height: 300
+    });
 </script>
+
 {{>/layout/footer}}
