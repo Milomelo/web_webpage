@@ -3,6 +3,8 @@ package site.metacoding.dbproject.web;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -95,7 +98,23 @@ public class PostController {
 
     // GET 글수정 페이지 /post/{id}/updateForm - 인증 필요
     @GetMapping("/s/post/{id}/updateForm")
-    public String updateForm(@PathVariable Integer id) {
+    public String updateForm(@PathVariable Integer id, Model model) {
+
+        // 인증
+        User principal = (User) session.getAttribute("principal");
+        if (principal == null) {
+            return "error/page1";
+        }
+
+        // 권한
+        Post postEntity = postService.글상세보기(id);
+
+        if (postEntity.getUser().getId() != principal.getId()) {
+            return "error/page1";
+        }
+
+        model.addAttribute("post", postEntity);
+
         return "post/updateForm"; // ViewResolver 도움 받음.
     }
 
@@ -121,8 +140,24 @@ public class PostController {
 
     // UPDATE 글수정 /post/{id} - 글상세보기 페이지가기 - 인증 필요
     @PutMapping("/s/post/{id}")
-    public String update(@PathVariable Integer id) {
-        return "redirect:/post/" + id;
+    public @ResponseBody ResponseDto<String> update(@PathVariable Integer id, @RequestBody Post post) {
+        // 인증
+        User principal = (User) session.getAttribute("principal");
+        if (principal == null) {
+            return new ResponseDto<String>(-1, "로그인이 되지 않았습니다.", null);
+        }
+
+        // 권한
+        Post postEntity = postService.글상세보기(id);
+
+        if (postEntity.getUser().getId() != principal.getId()) {
+            return new ResponseDto<String>(-1, "해당 게시글을 수정할 권한이 없습니다.", null);
+        }
+
+        postService.글수정하기(post, id);
+
+        return new ResponseDto<String>(1, "수정 성공.", null);
+
     }
 
     // POST 글쓰기 /post - 글목록으로 가기 - 인증 필요
